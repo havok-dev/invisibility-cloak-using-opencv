@@ -1,0 +1,169 @@
+'''
+IMAGE ARE STORED IN FORM OF MATRIX , EACH ELEMENT OF THAT AMTRIX REPRESENT THE COLOUR OF THE PIXEL OF THE IMAGE, SO A 400X500 IMAGE IS A MATRIX HAS 400 X 500 ELEMNTS
+'''
+import cv2
+import numpy as np
+import time
+print("package imported")                   #to check if cv2 is loaded or not
+#CHAPTER 1
+#PART-1 IMPORT A IMAGE
+'''
+img=cv2.imread("Resources/WhatsApp Image 2020-09-27 at 8.15.26 PM.jpeg")    #we created a variable to hold the value of image, and use cv2.imread function to access it
+cv2.imshow("Output",img)                             #cv2.imshow is used to show the image and output is the message in dialogue box, img is the variable shown
+cv2.waitKey(0)              # this is used to add a delay efore image disappears, 0 means infinite delay, any integer x will mean that much milli seconds of delay
+'''
+#PART-2 IMPORT A VIDEO
+'''
+cap=cv2.VideoCapture("Resources/video 1.mp4")       #this will import the the video to a variable cap
+while True:                                                         
+    success,img=cap.read()                          #img will read every slide of cap
+    cv2.imshow("Video",img)                         #this will show the image
+    if cv2.waitKey(1) & 0xff ==ord('q'):            #this will loop until q is pressed
+        break
+'''
+#PART-3 USE A WEBCAM
+'''
+cap=cv2.VideoCapture(0) #this will import the the video to a variable cap if we put value as 0 it will open the webcam, (1,2,3 if you have multiple cameras)
+cap.set(3,640)          # this will set the height and width of the webcam video
+cap.set(3,480)
+while True:
+    success,img=cap.read()                          #img will read every slide of cap
+    cv2.imshow("Video",img)                         #this will show the image
+    if cv2.waitKey(1) & 0xff ==ord(' '):            #this will loop until spacebar is pressed
+        break
+'''
+'''
+#CHAPTER-2-BASIC FUNCTIONS
+#PART-1
+img=cv2.imread("Resources/Test image 1.jpeg") #import image
+kernel=np.ones((5,5),np.uint8)  #this has created a matrix of order 5x5 and all elements in it have initial value 1 and can go to 255
+imggray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)    #this function will convert image to gray scale
+imgblur=cv2.GaussianBlur(img,(7,7),0)           #this will add blur, (7,7) is the kernal size( it can only be odd numbers),0 defines the sigma position
+imgcanny=cv2.Canny(img,100,100)             #this is used detect edges, 100,100 is the threshold values,increasing will reduce the no. of edges it would detect
+imgdialation=cv2.dilate(imgcanny,kernel,iterations=1) #this is used to dilate the images, also to kernel tells the amount of dilation, iteration tell how many time kernel
+                                                       # moves in image
+imgerosion=cv2.erode(imgdialation,kernel,iterations=1) #this is the opposite of dilation, it will make edges more defined, it is not 100% accurate
+cv2.imshow("original",img)
+cv2.imshow("grayscale",imggray)
+cv2.imshow("blur",imgblur)
+cv2.imshow("canny",imgcanny)
+cv2.imshow("dilated",imgdialation)
+cv2.imshow("Eroded",imgerosion)
+cv2.waitKey(0)
+'''
+'''
+#CHAPTER 3-RESIZING AND CROPPING
+img=cv2.imread("Resources/WhatsApp Image 2020-09-27 at 8.15.26 PM.jpeg")
+print(img.shape) #to show the size of the image it gives an putg like (x,y,z) x=height, y=length, z=no. of colours
+imgresize=cv2.resize(img,(800,500)) # this used to resize the image , in form of (x,y), x=width, y=height
+print(imgresize.shape)
+imgcropped=img[0:500,200:900] #this how we can crop images , [a:b,c:d] a,c are initial point of height and width respectively, b,d is the final point of hetght and width,
+                              #.'. a:b,c:d means height a to b, width c to d
+cv2.imshow("original",img)
+cv2.imshow("resize",imgresize)
+cv2.imshow("cropped",imgcropped)
+cv2.waitKey(0)
+'''
+'''
+#CHAPTER 4-SHAPES AND TEXT
+#img=np.zeros((512,512)) # make a black image of size 512x512
+img=np.zeros((512,512,3),np.uint8)  #to make a black img which can be coloured, and can take value from 0 to 255
+#print(img) #to see the image matrix
+#img[200:300,200:300]=(255,0,0)  #use to colour a section of image[a:b,c:d][a:b,c:d] a,c are initial point of height and width respectively, b,d is the final point of hetght and width,
+                              #.'. a:b,c:d means height a to b, width c to d.(x,y,z) x=value of blue,y=value of green,z-value of red
+cv2.line(img,(0,0),(img.shape[1],img.shape[0]),(0,255,0),5)#used to make a line on the image (img, initial point, final point,colour,thickness)
+cv2.rectangle(img,(0,0),(300,400),(0,0,255),5) #used to create a rectangle ,paramaeter as same as line, NOTE:TO FILL UP THIS RECTANGLE WRITE cv2.FILLED INSTEAD OF THICKNESS
+cv2.circle(img,(400,200),50,(255,0,0),5)#used to create a circle. PARAMETERS= (image,center,radius,colour,thickness)NOTE:TO FILL UP THIS WRITE cv2.FILLED INSTEAD OF THICKNESS
+cv2.putText(img," HARSH ",(300,200),cv2.FONT_ITALIC,2,(255,255,0),2)#USED TO ADD TEXT, PARAMETER= (image,text,starting point, font style,size, color,thickness)
+cv2.imshow("output",img)
+cv2.waitKey(0)
+'''
+'''
+#CHAPTER-5 WARP PERSPECTIVE-[BIRD EYE VIEW OF AN IMAGE]
+img=cv2.imread("Resources/carrousel5.jpg")
+width,height=156,184   #calculate width by finding points on paint and subtracting them
+pts1=np.float32([[542,188],[698,227],[457,372],[628,420]])# create and array that can take float value upto 32 bytes
+pts2=np.float32([[0,0],[width,0],[0,height],[width,height]])
+matrix=cv2.getPerspectiveTransform(pts1,pts2)   #to get get tranformational matrix -used in warpPerspectice function
+imgwp=cv2.warpPerspective(img,matrix,(width,height))    #FUNCTTION USED FOR WARP PERPECTIVE
+cv2.imshow("output",imgwp)
+cv2.imshow("input",img)
+cv2.waitKey(0)
+''''''
+#CHAPTER -6-STACKING
+img=cv2.imread("Resources/carrousel5.jpg")
+hor=np.hstack([img,img])
+ver=np.vstack([img,img])
+cv2.imshow("input",hor)
+cv2.waitKey(0)
+'''
+#CHAPTER0-7 COLOUR DETECTION
+img=cv2.imread("Resources/WIN_20201024_16_52_38_Pro.jpg")
+def empty(x):
+    pass
+cv2.namedWindow("Trackbars")
+cv2.resizeWindow("Trackbars",640,240)
+cv2.createTrackbar("Hue Min","Trackbars",26,179,empty)
+cv2.createTrackbar("Hue Max","Trackbars",179,179,empty)
+cv2.createTrackbar("Sat Min","Trackbars",68,255,empty)
+cv2.createTrackbar("Sat Max","Trackbars",255,255,empty)
+cv2.createTrackbar("Val Min","Trackbars",96,255,empty)
+cv2.createTrackbar("Val Max","Trackbars",255,255,empty)
+while True:
+    img=cv2.imread("Resources/WIN_20201024_16_52_38_Pro.jpg")
+    imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h_min = cv2.getTrackbarPos("Hue Min", "Trackbars")
+    h_max = cv2.getTrackbarPos("Hue Max", "Trackbars")
+    s_min = cv2.getTrackbarPos("Sat Min", "Trackbars")
+    s_max = cv2.getTrackbarPos("Sat Max", "Trackbars")
+    v_min = cv2.getTrackbarPos("Val Min", "Trackbars")
+    v_max = cv2.getTrackbarPos("Val Max", "Trackbars")
+    print(h_min,h_max,s_min,s_max,v_min,v_max)
+    lower=np.array([h_min,s_min,v_min])
+    upper=np.array([h_max,s_max,v_max])
+    mask=cv2.inRange(imgHSV,lower,upper)
+    imgrResult=cv2.bitwise_and(img,img,mask=mask)
+
+
+
+    cv2.imshow("Original",img)
+    cv2.imshow("HSV",imgHSV)
+    cv2.imshow("mask",mask)
+    cv2.imshow("Result",imgrResult)
+    cv2.waitKey(1)
+
+'''
+vid=cv2.VideoCapture(0)
+vid.set(3,640)
+vid.set(3,480)
+time.sleep(2)
+
+bg=0
+
+for i in range (30):
+    ret,background=vid.read()
+
+while( vid.isOpened()):
+    ret,img=vid.read()
+
+    if not ret:
+        break
+
+    hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+
+    lower=np.array([26,68,96])
+    upper=np.array([179,255,255])
+    mask1=cv2.inRange(hsv,lower,upper)
+
+    mask1=cv2.morphologyEx(mask1,cv2.MORPH_OPEN,np.ones((3,3),np.uint8),iterations=2)
+    mask1 = cv2.morphologyEx(mask1, cv2.MORPH_DILATE, np.ones((3, 3), np.uint8), iterations=1)
+    mask2=cv2.bitwise_not(mask1)
+
+    result1 = cv2.bitwise_and(bg,bg, mask=mask1)
+    result2 = cv2.bitwise_and(img,img, mask=mask2)
+
+    final_Result=cv2.addWeighted(result1,1,result2,1,0)
+
+    cv2.imshow("output",bg)
+    cv2.waitKey(10)
+'''
